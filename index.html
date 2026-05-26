@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>厄拉科斯情報網 - 亞崔迪家族專用觀測儀 V2</title>
+    <title>Arrakis Intel Network - Atreides Monitor V3</title>
     <style>
         :root {
             --bg-color: #12161a;
@@ -14,7 +14,7 @@
             --atreides-glow: #3cd070;
             --border-color: #2c353f;
             
-            /* 卡牌類別顏色 */
+            /* Card Category Colors */
             --weapon-color: #a63a3a;
             --weapon-border: #ff5252;
             --defense-color: #1b4d6b;
@@ -50,6 +50,12 @@
             font-size: 1.4rem;
             color: var(--atreides-glow);
             letter-spacing: 2px;
+        }
+
+        header p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
         }
 
         .forecast-section {
@@ -151,9 +157,9 @@
         }
 
         .btn:active { background-color: #374654; }
-        .low-spice { color: #ff6b6b; animation: pulse 2s infinite; }
+        .low-spice { color: #ff6b6b; }
 
-        /* --- 新版情報區 UI --- */
+        /* --- Intel UI --- */
         .intel-section {
             background-color: #151a1f;
             border-radius: 8px;
@@ -168,7 +174,7 @@
             font-weight: bold;
         }
 
-        /* 備選卡牌池 (點擊新增) */
+        /* Card Template Pool */
         .add-pool {
             display: flex;
             flex-wrap: wrap;
@@ -179,7 +185,7 @@
         .add-btn {
             background-color: #202a33;
             border: 1px solid var(--border-color);
-            color: var(--text-muted);
+            color: var(--text-main);
             padding: 6px 10px;
             font-size: 0.8rem;
             border-radius: 4px;
@@ -189,7 +195,7 @@
 
         .add-btn:active { transform: scale(0.95); }
         
-        /* 手牌顯示區 (點擊扣除) */
+        /* Known Hand Displays */
         .known-hand {
             display: flex;
             flex-wrap: wrap;
@@ -225,7 +231,6 @@
             font-size: 0.75rem;
         }
 
-        /* 卡牌顏色對應 */
         .type-weapon { background-color: var(--weapon-color); border-color: var(--weapon-border); }
         .type-defense { background-color: var(--defense-color); border-color: var(--defense-border); }
         .type-other { background-color: var(--other-color); border-color: var(--other-border); }
@@ -254,50 +259,49 @@
 <body>
 
     <header>
-        <h1>亞崔迪家族資訊觀測儀 V2</h1>
-        <p>「多重情報，一覽無遺」</p>
+        <h1>Atreides Intelligence Tracker</h1>
+        <p>"The highest oracle commands the currents of Arrakis"</p>
     </header>
 
     <div class="forecast-section">
-        <div class="forecast-title">👁️ 未來預知欄（香料爆發/沙蟲/氣象）</div>
-        <textarea class="forecast-input" rows="2" placeholder="點擊此處記錄下一回合預知到的香料領地或沙蟲警報..."></textarea>
+        <div class="forecast-title">👁️ Prescience / Forecast (Spice Blow / Sandworm / Weather)</div>
+        <textarea class="forecast-input" rows="2" placeholder="Tap here to record prescient visions, spice blow territories, or sandworm warnings..."></textarea>
     </div>
 
     <div class="factions-grid" id="factionsContainer"></div>
 
     <div class="reset-container">
-        <button class="btn-reset" onclick="resetGame()">重置全域情報</button>
+        <button class="btn-reset" onclick="resetGame()">Reset All Intelligence</button>
     </div>
 
     <script>
         const initialFactions = [
-            { id: 'harkonnen', name: '哈肯尼家族 (Harkonnen)', color: '#cc3333' },
-            { id: 'emperor', name: '柯瑞諾皇帝 (Emperor)', color: '#e6b800' },
-            { id: 'fremen', name: '弗瑞曼人 (Fremen)', color: '#3399ff' },
-            { id: 'guild', name: '宇航公會 (Spacing Guild)', color: '#ff6600' },
-            { id: 'bg', name: '貝尼·潔瑟睿德 (Bene Gesserit)', color: '#9933ff' }
+            { id: 'harkonnen', name: 'House Harkonnen', color: '#cc3333' },
+            { id: 'emperor', name: 'The Emperor', color: '#e6b800' },
+            { id: 'fremen', name: 'Fremen', color: '#3399ff' },
+            { id: 'guild', name: 'Spacing Guild', color: '#ff6600' },
+            { id: 'bg', name: 'Bene Gesserit', color: '#9933ff' }
         ];
 
-        // 完整卡牌庫 (包含武器、防禦、廉價英雄與無用卡)
+        // Core Standard Cards Pool
         const cardTypes = [
-            { id: 'poison', text: '毒藥', type: 'type-weapon' },
-            { id: 'projectile', text: '物理武器', type: 'type-weapon' },
-            { id: 'lasgun', text: '雷射槍', type: 'type-weapon' },
-            { id: 'snooper', text: '防毒', type: 'type-defense' },
-            { id: 'shield', text: '護盾', type: 'type-defense' },
-            { id: 'cheap_hero', text: '廉價英雄', type: 'type-other' },
-            { id: 'worthless', text: '無用卡', type: 'type-other' },
-            { id: 'special', text: '特殊卡', type: 'type-other' }
+            { id: 'poison', text: 'Poison', type: 'type-weapon' },
+            { id: 'projectile', text: 'Projectile', type: 'type-weapon' },
+            { id: 'lasgun', text: 'Lasgun', type: 'type-weapon' },
+            { id: 'snooper', text: 'Snooper', type: 'type-defense' },
+            { id: 'shield', text: 'Shield', type: 'type-defense' },
+            { id: 'cheap_hero', text: 'Cheap Hero', type: 'type-other' },
+            { id: 'worthless', text: 'Worthless', type: 'type-other' }
         ];
 
-        // 使用 v2 版本的 key 避免與舊資料衝突
-        let gameState = JSON.parse(localStorage.getItem('dune_atreides_state_v2')) || {
+        // Dynamic V3 state storage key
+        let gameState = JSON.parse(localStorage.getItem('dune_atreides_state_v3')) || {
             forecast: '',
             factions: initialFactions.map(f => ({
                 ...f,
                 spice: 5,
                 totalCards: 0,
-                knownHand: {} // 改用物件來儲存同名卡牌數量，例如 { 'poison': 2, 'shield': 1 }
+                knownHand: {} // Structure supports both IDs and Custom Text keys
             }))
         };
 
@@ -309,28 +313,36 @@
             gameState.factions.forEach((faction, index) => {
                 const isLowSpice = faction.spice < 3 ? 'low-spice' : '';
                 
-                // 產生卡牌加入池
-                const addPoolHtml = cardTypes.map(c => 
+                // Build HTML for Standard Buttons
+                let addPoolHtml = cardTypes.map(c => 
                     `<button class="add-btn" onclick="addCard(${index}, '${c.id}')">+ ${c.text}</button>`
                 ).join('');
+                
+                // Append the Custom Card input trigger button
+                addPoolHtml += `<button class="add-btn" style="border-color: var(--other-border); font-style: italic;" onclick="addCustomCardPrompt(${index})">+ Custom...</button>`;
 
-                // 產生已知手牌區
+                // Generate Known Hand UI tags
                 let handHtml = '';
                 let hasCards = false;
-                for (const [cardId, count] of Object.entries(faction.knownHand)) {
+                for (const [cardKey, count] of Object.entries(faction.knownHand)) {
                     if (count > 0) {
                         hasCards = true;
-                        const cardDef = cardTypes.find(c => c.id === cardId);
+                        const cardDef = cardTypes.find(c => c.id === cardKey);
+                        
+                        // If it's a standard ID, use mapped name and type; otherwise treat as custom text
+                        const displayName = cardDef ? cardDef.text : cardKey;
+                        const displayType = cardDef ? cardDef.type : 'type-other';
+                        
                         handHtml += `
-                            <div class="hand-tag ${cardDef.type}" onclick="removeCard(${index}, '${cardId}')">
-                                ${cardDef.text} <span class="badge">x${count}</span>
+                            <div class="hand-tag ${displayType}" onclick="removeCard(${index}, '${cardKey}')">
+                                ${displayName} <span class="badge">x${count}</span>
                             </div>
                         `;
                     }
                 }
                 
                 if (!hasCards) {
-                    handHtml = `<div class="empty-hand">尚未掌握手牌情報...</div>`;
+                    handHtml = `<div class="empty-hand">No hand intel acquired yet...</div>`;
                 }
                 
                 const cardHtml = `
@@ -341,7 +353,7 @@
                         
                         <div class="counters-row">
                             <div class="counter-box">
-                                <div class="counter-label">香料儲備</div>
+                                <div class="counter-label">Spice Reserves</div>
                                 <div class="counter-value ${isLowSpice}">${faction.spice}</div>
                                 <div class="btn-group">
                                     <button class="btn" onclick="changeSpice(${index}, -1)">-1</button>
@@ -352,7 +364,7 @@
                             </div>
                             
                             <div class="counter-box">
-                                <div class="counter-label">手牌總數上限</div>
+                                <div class="counter-label">Hand Cards</div>
                                 <div class="counter-value">${faction.totalCards}</div>
                                 <div class="btn-group">
                                     <button class="btn" onclick="changeTotalCards(${index}, -1)">-1</button>
@@ -362,13 +374,13 @@
                         </div>
 
                         <div class="intel-section">
-                            <div class="intel-label">📥 情報錄入 (點擊新增至對方手牌)：</div>
+                            <div class="intel-label">📥 Log Intel (Tap to add to enemy hand):</div>
                             <div class="add-pool">
                                 ${addPoolHtml}
                             </div>
                             
                             <div class="intel-label" style="border-top: 1px solid #2c353f; padding-top: 8px; margin-top: 8px;">
-                                👁️ 已知手牌 (對手打出後，點擊即可消耗)：
+                                👁️ Known Hand (Tap to discard when played):
                             </div>
                             <div class="known-hand">
                                 ${handHtml}
@@ -379,10 +391,10 @@
                 container.innerHTML += cardHtml;
             });
 
-            localStorage.setItem('dune_atreides_state_v2', JSON.stringify(gameState));
+            localStorage.setItem('dune_atreides_state_v3', JSON.stringify(gameState));
         }
 
-        // 數據操作邏輯
+        // Logic & Adjustments
         function changeSpice(index, val) {
             gameState.factions[index].spice = Math.max(0, gameState.factions[index].spice + val);
             render();
@@ -393,24 +405,32 @@
             render();
         }
 
-        // 新增一張卡牌至已知手牌
         function addCard(factionIndex, cardId) {
             const hand = gameState.factions[factionIndex].knownHand;
             if (!hand[cardId]) hand[cardId] = 0;
             hand[cardId]++;
-            
-            // 可選功能：自動增加該勢力的「手牌總數」
             gameState.factions[factionIndex].totalCards++;
-            
             render();
         }
 
-        // 從已知手牌中消耗一張卡牌
-        function removeCard(factionIndex, cardId) {
+        // Prompt user for dynamic special card name input
+        function addCustomCardPrompt(factionIndex) {
+            const customName = prompt("Enter Special Card Name (e.g., Karama, Truthteller, Atomics):");
+            if (customName && customName.trim() !== "") {
+                const cleanedName = customName.trim();
+                const hand = gameState.factions[factionIndex].knownHand;
+                if (!hand[cleanedName]) hand[cleanedName] = 0;
+                
+                hand[cleanedName]++;
+                gameState.factions[factionIndex].totalCards++;
+                render();
+            }
+        }
+
+        function removeCard(factionIndex, cardKey) {
             const hand = gameState.factions[factionIndex].knownHand;
-            if (hand[cardId] && hand[cardId] > 0) {
-                hand[cardId]--;
-                // 同步扣除手牌總數
+            if (hand[cardKey] && hand[cardKey] > 0) {
+                hand[cardKey]--;
                 gameState.factions[factionIndex].totalCards = Math.max(0, gameState.factions[factionIndex].totalCards - 1);
             }
             render();
@@ -418,12 +438,12 @@
 
         document.querySelector('.forecast-input').addEventListener('input', (e) => {
             gameState.forecast = e.target.value;
-            localStorage.setItem('dune_atreides_state_v2', JSON.stringify(gameState));
+            localStorage.setItem('dune_atreides_state_v3', JSON.stringify(gameState));
         });
 
         function resetGame() {
-            if(confirm('確定要清空當前這局的所有香料與手牌情報嗎？')) {
-                localStorage.removeItem('dune_atreides_state_v2');
+            if(confirm('Are you sure you want to clear all spice and hand data for this game?')) {
+                localStorage.removeItem('dune_atreides_state_v3');
                 gameState = {
                     forecast: '',
                     factions: initialFactions.map(f => ({
