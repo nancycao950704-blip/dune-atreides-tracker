@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arrakis Intel Network - Atreides Monitor V3</title>
+    <title>Arrakis Intel Network - Atreides Monitor V4</title>
     <style>
         :root {
             --bg-color: #12161a;
@@ -275,12 +275,13 @@
     </div>
 
     <script>
+        // Updated Faction Names & Colors per original board game aesthetics
         const initialFactions = [
-            { id: 'harkonnen', name: 'House Harkonnen', color: '#cc3333' },
-            { id: 'emperor', name: 'The Emperor', color: '#e6b800' },
-            { id: 'fremen', name: 'Fremen', color: '#3399ff' },
-            { id: 'guild', name: 'Spacing Guild', color: '#ff6600' },
-            { id: 'bg', name: 'Bene Gesserit', color: '#9933ff' }
+            { id: 'harkonnen', name: 'Harkonnen', color: '#595959' }, // 深灰色
+            { id: 'emperor', name: 'Emperor', color: '#d92b2b' }, // 紅色
+            { id: 'fremen', name: 'Fremen', color: '#f1c40f' }, // 黃色
+            { id: 'guild', name: 'Spacing Guild', color: '#e67e22' }, // 橙色
+            { id: 'bg', name: 'Bene Gesserit', color: '#6f42c1' } // 藍紫色
         ];
 
         // Core Standard Cards Pool
@@ -294,14 +295,14 @@
             { id: 'worthless', text: 'Worthless', type: 'type-other' }
         ];
 
-        // Dynamic V3 state storage key
-        let gameState = JSON.parse(localStorage.getItem('dune_atreides_state_v3')) || {
+        // Dynamic V4 state storage key (changed to ensure old data is wiped and new colors load instantly)
+        let gameState = JSON.parse(localStorage.getItem('dune_atreides_state_v4')) || {
             forecast: '',
             factions: initialFactions.map(f => ({
                 ...f,
                 spice: 5,
                 totalCards: 0,
-                knownHand: {} // Structure supports both IDs and Custom Text keys
+                knownHand: {} 
             }))
         };
 
@@ -391,7 +392,7 @@
                 container.innerHTML += cardHtml;
             });
 
-            localStorage.setItem('dune_atreides_state_v3', JSON.stringify(gameState));
+            localStorage.setItem('dune_atreides_state_v4', JSON.stringify(gameState));
         }
 
         // Logic & Adjustments
@@ -438,12 +439,12 @@
 
         document.querySelector('.forecast-input').addEventListener('input', (e) => {
             gameState.forecast = e.target.value;
-            localStorage.setItem('dune_atreides_state_v3', JSON.stringify(gameState));
+            localStorage.setItem('dune_atreides_state_v4', JSON.stringify(gameState));
         });
 
         function resetGame() {
             if(confirm('Are you sure you want to clear all spice and hand data for this game?')) {
-                localStorage.removeItem('dune_atreides_state_v3');
+                localStorage.removeItem('dune_atreides_state_v4');
                 gameState = {
                     forecast: '',
                     factions: initialFactions.map(f => ({
